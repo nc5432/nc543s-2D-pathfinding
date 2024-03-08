@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace nc543.Nav{
+namespace nc543.Nav2D{
     public class NavigationGrid : MonoBehaviour{
         public LayerMask blockingMask;
         public Vector2 gridSize;
@@ -11,6 +11,7 @@ namespace nc543.Nav{
         [Header("Debug")]
         public Transform checker;
         public bool collisionDebug = false;
+        public List<Node> path;
 
         Node[,] navGrid;
         int nodesX;
@@ -31,9 +32,26 @@ namespace nc543.Nav{
                 for (int j = 0; j < nodesY; j++){
                     Vector3 loc = bottomLeftLoc + (Vector3.right * ((i * nodeSize) + (nodeSize / 2))) + (Vector3.up * ((j * nodeSize) + (nodeSize / 2)));
                     bool traverse = !Physics2D.OverlapBox(loc, new Vector2(nodeSize / 2, nodeSize / 2), 0, blockingMask);
-                    navGrid[i, j] = new Node(traverse, loc);
+                    navGrid[i, j] = new Node(traverse, loc, i, j);
                 }
             }
+        }
+
+        public List<Node> getNeighbors(Node node){
+            List<Node> neighbors = new List<Node>();
+            for (int i = -1; i <= 1; i++){
+                for (int j = -1; j <= 1; j++){
+                    if (i == 0 && j == 0) continue;
+                    int x = node.x + i;
+                    int y = node.y + j;
+
+                    if (x >= 0 && x < nodesX && y >= 0 && y < nodesY){
+                        neighbors.Add(navGrid[x, y]);
+                    }
+                }
+            }
+
+            return neighbors;
         }
 
         public Node worldToNavGrid(Vector3 pos){
@@ -52,6 +70,7 @@ namespace nc543.Nav{
                 foreach (Node node in navGrid){
                     Gizmos.color = (node.traversable) ? Color.green : Color.red;
                     if (checkNode == node) Gizmos.color = Color.blue;
+                    if (path != null && path.Contains(node)) Gizmos.color = Color.yellow;
                     Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
                 }
             }
