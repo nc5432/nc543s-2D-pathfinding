@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace nc543.Nav2D{
-    public class Node{
+    public class Node : IHeapItem<Node>{
         public bool traversable;
         public Vector3 position;
         public int x;
@@ -11,6 +11,7 @@ namespace nc543.Nav2D{
         public int gCost;
         public int hCost;
         public Node pastNode;
+        int heapIndex;
 
         public Node(bool _traversable, Vector3 _position, int _x, int _y){
             traversable = _traversable;
@@ -23,6 +24,22 @@ namespace nc543.Nav2D{
             get{
                 return gCost + hCost;
             }
+        }
+
+        public int HeapIndex{
+            get{
+                return heapIndex;
+            }set{
+                heapIndex = value;
+            }
+        }
+
+        public int CompareTo(Node comparing){
+            int compare = fCost.CompareTo(comparing.fCost);
+            if (compare == 0){
+                compare = hCost.CompareTo(comparing.hCost);
+            }
+            return -compare;
         }
     }
 }

@@ -9,8 +9,10 @@ namespace nc543.Nav2D{
         public float nodeSize;
 
         [Header("Debug")]
-        public Transform checker;
+        public Transform seeker;
+        public Transform target;
         public bool collisionDebug = false;
+        public bool onlyDisplayPath = false;
         public List<Node> path;
 
         Node[,] navGrid;
@@ -21,6 +23,10 @@ namespace nc543.Nav2D{
             nodesX = Mathf.RoundToInt(gridSize.x/nodeSize);
             nodesY = Mathf.RoundToInt(gridSize.y/nodeSize);
             generateNavigationGrid();
+        }
+
+        void Update(){
+            FindPath(seeker.position, target.position);
         }
 
         private void generateNavigationGrid(){
@@ -61,17 +67,75 @@ namespace nc543.Nav2D{
             return navGrid[Mathf.RoundToInt((nodesX - 1) * percentX), Mathf.RoundToInt((nodesY - 1) * percentY)];
         }
 
+        private void FindPath(Vector3 start, Vector3 target){
+            Node startNode = worldToNavGrid(start);
+            Node targetNode = worldToNavGrid(target);
+
+            Heap<Node> open = new Heap<Node>(nodesX * nodesY);
+            HashSet<Node> closed = new HashSet<Node>();
+
+            open.add(startNode);
+
+            while (open.getSize() > 0){
+                Node currentNode = open.removeFirst();
+                closed.Add(currentNode);
+
+                if (currentNode == targetNode){
+                    tracePath(startNode, targetNode);
+                    return;
+                }
+                foreach (Node neighbor in getNeighbors(currentNode)){
+                    if (neighbor.traversable && !closed.Contains(neighbor)){
+                        int newCost = currentNode.gCost + getDistance(currentNode, neighbor);
+                        if (newCost < neighbor.gCost || !open.contains(neighbor)){
+                            neighbor.gCost = newCost;
+                            neighbor.hCost = getDistance(neighbor, targetNode);
+                            neighbor.pastNode = currentNode;
+                            if (!open.contains(neighbor)) open.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void tracePath(Node startNode, Node endNode){
+            path = new List<Node>();
+            Node currentNode = endNode;
+            while (currentNode != startNode){
+                path.Add(currentNode);
+                currentNode = currentNode.pastNode;
+            }
+            path.Reverse();
+        }
+
+        private int getDistance(Node node1, Node node2){
+            int distanceX = Mathf.Abs(node1.x - node2.x);
+            int distanceY = Mathf.Abs(node1.y - node2.y);
+
+            if (distanceX > distanceY){
+                return 14 * distanceY + 10 * (distanceX - distanceY);
+            }else{
+                return 14 * distanceX + 10 * (distanceY - distanceX);
+            }
+        }
+
         void OnDrawGizmos(){
             Gizmos.DrawWireCube(transform.position, new Vector3(gridSize.x, gridSize.y, 1));
 
             if (navGrid != null && collisionDebug){
                 Node checkNode = null;
-                if (checker != null) checkNode = worldToNavGrid(checker.position);
+                if (seeker != null) checkNode = worldToNavGrid(seeker.position);
                 foreach (Node node in navGrid){
-                    Gizmos.color = (node.traversable) ? Color.green : Color.red;
-                    if (checkNode == node) Gizmos.color = Color.blue;
-                    if (path != null && path.Contains(node)) Gizmos.color = Color.yellow;
-                    Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
+                    if (onlyDisplayPath){
+                        if (!path.Contains(node)) continue;
+                        Gizmos.color = Color.yellow;
+                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
+                    }else{
+                        Gizmos.color = (node.traversable) ? Color.green : Color.red;
+                        if (checkNode == node) Gizmos.color = Color.blue;
+                        if (path != null && path.Contains(node)) Gizmos.color = Color.yellow;
+                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
+                    }
                 }
             }
         }
