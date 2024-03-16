@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,26 +8,45 @@ namespace nc543.Nav2D{
         public LayerMask blockingMask;
         public Vector2 gridSize;
         public float nodeSize;
+        public TerrainType[] walkableRegions;
+        LayerMask walkableMask;
+        Dictionary<int, int> walkableRegionsDictionary = new Dictionary<int, int>();
+
+        [Header("Pathing Settings")]
+        public int obstacleAvoidanceStrength = 10;
+        public bool smoothWeights = true;
+        public int smoothing = 1;
 
         [Header("Debug")]
-        public Transform seeker;
-        public Transform target;
         public bool collisionDebug = false;
         public bool onlyDisplayPath = false;
         public List<Node> path;
 
+        int penaltyMin = int.MaxValue;
+        int penaltyMax = int.MinValue;
+
         Node[,] navGrid;
         int nodesX;
         int nodesY;
+        PathRequestManager requestManager;
 
-        void Start(){
+        void Awake(){
+            requestManager = GetComponent<PathRequestManager>();
             nodesX = Mathf.RoundToInt(gridSize.x/nodeSize);
             nodesY = Mathf.RoundToInt(gridSize.y/nodeSize);
+
+            foreach (TerrainType region in walkableRegions){
+                walkableMask.value = walkableMask | region.terrainMask.value;
+                walkableRegionsDictionary.Add((int) Mathf.Log(region.terrainMask.value, 2), region.terrainPenalty);
+                if (region.terrainPenalty > penaltyMax) penaltyMax = region.terrainPenalty;
+                if (region.terrainPenalty < penaltyMin) penaltyMin = region.terrainPenalty;
+            }
+
             generateNavigationGrid();
         }
 
-        void Update(){
-            FindPath(seeker.position, target.position);
+        public void startPathfinding(Vector3 start, Vector3 end){
+            StartCoroutine(findPath(start, end));
         }
 
         private void generateNavigationGrid(){
@@ -38,7 +58,61 @@ namespace nc543.Nav2D{
                 for (int j = 0; j < nodesY; j++){
                     Vector3 loc = bottomLeftLoc + (Vector3.right * ((i * nodeSize) + (nodeSize / 2))) + (Vector3.up * ((j * nodeSize) + (nodeSize / 2)));
                     bool traverse = !Physics2D.OverlapBox(loc, new Vector2(nodeSize / 2, nodeSize / 2), 0, blockingMask);
-                    navGrid[i, j] = new Node(traverse, loc, i, j);
+                    int movementPenalty = 0;
+                    Collider2D spot = Physics2D.OverlapBox(loc, new Vector2(nodeSize / 2, nodeSize / 2), 0, walkableMask);
+                    if (traverse && spot){
+                        walkableRegionsDictionary.TryGetValue(spot.gameObject.layer, out movementPenalty);
+                    }else if (!traverse){
+                        movementPenalty += obstacleAvoidanceStrength;
+                    }
+                    navGrid[i, j] = new Node(traverse, loc, i, j, movementPenalty);
+                }
+            }
+            if (smoothWeights) blurMap(smoothing);
+        }
+
+        void blurMap(int blurSize){
+            print("Running blur");
+            int kernelSize = blurSize * 2 + 1;
+            int kernelExtents = (kernelSize - 1) / 2;
+
+            int[,] horizontalPass = new int[nodesX, nodesY];
+            int[,] verticalPass = new int[nodesX, nodesY];
+
+            for (int i = 0; i < nodesY; i++){
+                for (int j = -kernelExtents; j <= kernelExtents; j++){
+                    int sampleX = Mathf.Clamp(j, 0, kernelExtents);
+                    horizontalPass[0, i] += navGrid[sampleX, i].movementPenalty;
+                }
+
+                for (int j = 1; j < nodesX; j++){
+                    int removeIndex = Mathf.Clamp(j - kernelExtents - 1, 0, nodesX);
+                    int addIndex = Mathf.Clamp(j + kernelExtents, 0, nodesX - 1);
+                    horizontalPass[j, i] = horizontalPass[j - 1, i] - navGrid[removeIndex, i].movementPenalty + navGrid[addIndex, i].movementPenalty;
+                }
+            }
+
+            for (int i = 0; i < nodesX; i++){
+                for (int j = -kernelExtents; j <= kernelExtents; j++){
+                    int sampleY = Mathf.Clamp(j, 0, kernelExtents);
+                    verticalPass[i, 0] += horizontalPass[i, sampleY];
+                }
+
+                int blurredPenalty = Mathf.RoundToInt((float) verticalPass[i, 0] / (kernelSize * kernelSize));
+                navGrid[i, 0].movementPenalty = blurredPenalty;
+
+                for (int j = 1; j < nodesY; j++){
+                    int removeIndex = Mathf.Clamp(j - kernelExtents - 1, 0, nodesY);
+                    int addIndex = Mathf.Clamp(j + kernelExtents, 0, nodesY - 1);
+                    verticalPass[i, j] = verticalPass[i, j - 1] - horizontalPass[i, removeIndex] + horizontalPass[i, addIndex];
+                    blurredPenalty = Mathf.RoundToInt((float) verticalPass[i, j] / (kernelSize * kernelSize));
+                    navGrid[i, j].movementPenalty = blurredPenalty;
+
+                    if (blurredPenalty > penaltyMax){
+                        penaltyMax = blurredPenalty;
+                    }else if (blurredPenalty < penaltyMin){
+                        penaltyMin = blurredPenalty;
+                    }
                 }
             }
         }
@@ -67,45 +141,73 @@ namespace nc543.Nav2D{
             return navGrid[Mathf.RoundToInt((nodesX - 1) * percentX), Mathf.RoundToInt((nodesY - 1) * percentY)];
         }
 
-        private void FindPath(Vector3 start, Vector3 target){
+        private IEnumerator findPath(Vector3 start, Vector3 target){
             Node startNode = worldToNavGrid(start);
             Node targetNode = worldToNavGrid(target);
 
-            Heap<Node> open = new Heap<Node>(nodesX * nodesY);
-            HashSet<Node> closed = new HashSet<Node>();
+            Vector3[] navigation = {};
+            bool successful = false;
 
-            open.add(startNode);
+            if (startNode.traversable && targetNode.traversable){
 
-            while (open.getSize() > 0){
-                Node currentNode = open.removeFirst();
-                closed.Add(currentNode);
+                Heap<Node> open = new Heap<Node>(nodesX * nodesY);
+                HashSet<Node> closed = new HashSet<Node>();
 
-                if (currentNode == targetNode){
-                    tracePath(startNode, targetNode);
-                    return;
-                }
-                foreach (Node neighbor in getNeighbors(currentNode)){
-                    if (neighbor.traversable && !closed.Contains(neighbor)){
-                        int newCost = currentNode.gCost + getDistance(currentNode, neighbor);
-                        if (newCost < neighbor.gCost || !open.contains(neighbor)){
-                            neighbor.gCost = newCost;
-                            neighbor.hCost = getDistance(neighbor, targetNode);
-                            neighbor.pastNode = currentNode;
-                            if (!open.contains(neighbor)) open.add(neighbor);
+                open.add(startNode);
+
+                while (open.getSize() > 0){
+                    Node currentNode = open.removeFirst();
+                    closed.Add(currentNode);
+
+                    if (currentNode == targetNode){
+                        successful = true;
+                        break;
+                    }
+                    foreach (Node neighbor in getNeighbors(currentNode)){
+                        if (neighbor.traversable && !closed.Contains(neighbor)){
+                            int newCost = currentNode.gCost + getDistance(currentNode, neighbor) + neighbor.movementPenalty;
+                            if (newCost < neighbor.gCost || !open.contains(neighbor)){
+                                neighbor.gCost = newCost;
+                                neighbor.hCost = getDistance(neighbor, targetNode);
+                                neighbor.pastNode = currentNode;
+                                if (!open.contains(neighbor)) open.add(neighbor);
+                                else open.updateItem(neighbor);
+                            }
                         }
                     }
                 }
             }
+            yield return null;
+            if (successful){
+                navigation = tracePath(startNode, targetNode);
+            }
+            requestManager.finishedPath(navigation, successful);
         }
 
-        private void tracePath(Node startNode, Node endNode){
+        private Vector3[] tracePath(Node startNode, Node endNode){
             path = new List<Node>();
             Node currentNode = endNode;
             while (currentNode != startNode){
                 path.Add(currentNode);
                 currentNode = currentNode.pastNode;
             }
-            path.Reverse();
+            Vector3[] navigation = simplifyPath(path);
+            Array.Reverse(navigation);
+            return navigation;
+        }
+
+        private Vector3[] simplifyPath(List<Node> path){
+            List<Vector3> nav = new List<Vector3>();
+            Vector2 oldDir = Vector2.zero;
+
+            for (int i = 1; i < path.Count; i++){
+                Vector2 newDir = new Vector2(path[i - 1].x - path[i].x, path[i - 1].y - path[i].y);
+                if (newDir != oldDir){
+                    nav.Add(path[i].position);
+                }
+                oldDir = newDir;
+            }
+            return nav.ToArray();
         }
 
         private int getDistance(Node node1, Node node2){
@@ -124,20 +226,29 @@ namespace nc543.Nav2D{
 
             if (navGrid != null && collisionDebug){
                 Node checkNode = null;
-                if (seeker != null) checkNode = worldToNavGrid(seeker.position);
                 foreach (Node node in navGrid){
                     if (onlyDisplayPath){
                         if (!path.Contains(node)) continue;
                         Gizmos.color = Color.yellow;
-                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
+                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize));
                     }else{
-                        Gizmos.color = (node.traversable) ? Color.green : Color.red;
+                        if (node.traversable){
+                            Gizmos.color = Color.Lerp(Color.white, Color.black, Mathf.InverseLerp(penaltyMin, penaltyMax, node.movementPenalty));
+                        }else{
+                            Gizmos.color = Color.red;
+                        }
                         if (checkNode == node) Gizmos.color = Color.blue;
                         if (path != null && path.Contains(node)) Gizmos.color = Color.yellow;
-                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize - 0.1f));
+                        Gizmos.DrawCube(node.position, Vector3.one * (nodeSize));
                     }
                 }
             }
+        }
+
+        [System.Serializable]
+        public class TerrainType{
+            public LayerMask terrainMask;
+            public int terrainPenalty;
         }
     }
 }

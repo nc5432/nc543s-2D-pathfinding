@@ -11,13 +11,15 @@ namespace nc543.Nav2D{
         public int gCost;
         public int hCost;
         public Node pastNode;
+        public int movementPenalty;
         int heapIndex;
 
-        public Node(bool _traversable, Vector3 _position, int _x, int _y){
+        public Node(bool _traversable, Vector3 _position, int _x, int _y, int _penalty){
             traversable = _traversable;
             position = _position;
             x = _x;
             y = _y;
+            movementPenalty = _penalty;
         }
 
         public int fCost{
