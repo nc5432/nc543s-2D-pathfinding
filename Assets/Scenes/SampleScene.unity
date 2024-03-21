@@ -308,8 +308,8 @@ GameObject:
   m_Component:
   - component: {fileID: 107054741}
   - component: {fileID: 107054744}
+  - component: {fileID: 107054743}
   - component: {fileID: 107054742}
-  - component: {fileID: 107054745}
   m_Layer: 0
   m_Name: TestNavAgent (3)
   m_TagString: Untagged
@@ -367,6 +367,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &107054743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107054740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &107054744
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -419,20 +433,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &107054745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 107054740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &140139199
 GameObject:
   m_ObjectHideFlags: 0
@@ -1774,8 +1774,8 @@ GameObject:
   m_Component:
   - component: {fileID: 483280965}
   - component: {fileID: 483280968}
+  - component: {fileID: 483280967}
   - component: {fileID: 483280966}
-  - component: {fileID: 483280969}
   m_Layer: 0
   m_Name: TestNavAgent (5)
   m_TagString: Untagged
@@ -1833,6 +1833,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &483280967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483280964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &483280968
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1885,20 +1899,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &483280969
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 483280964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3431,8 +3431,8 @@ GameObject:
   m_Component:
   - component: {fileID: 840766287}
   - component: {fileID: 840766290}
+  - component: {fileID: 840766289}
   - component: {fileID: 840766288}
-  - component: {fileID: 840766291}
   m_Layer: 0
   m_Name: TestNavAgent (1)
   m_TagString: Untagged
@@ -3490,6 +3490,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &840766289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 840766286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &840766290
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3542,20 +3556,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &840766291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 840766286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &902288710
 GameObject:
   m_ObjectHideFlags: 0
@@ -4217,8 +4217,6 @@ GameObject:
   - component: {fileID: 1126842765}
   - component: {fileID: 1126842764}
   - component: {fileID: 1126842766}
-  - component: {fileID: 1126842768}
-  - component: {fileID: 1126842767}
   m_Layer: 0
   m_Name: A*
   m_TagString: Untagged
@@ -4239,27 +4237,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockingMask:
+    serializedVersion: 2
     m_Bits: 8
   gridSize: {x: 30, y: 30}
   nodeSize: 0.5
   walkableRegions:
   - terrainMask:
+      serializedVersion: 2
       m_Bits: 64
     terrainPenalty: 0
   - terrainMask:
+      serializedVersion: 2
       m_Bits: 1
     terrainPenalty: 50
-  walkableMask:
-    m_Bits: 0
   obstacleAvoidanceStrength: 100
   smoothWeights: 1
   smoothing: 1
   collisionDebug: 0
   onlyDisplayPath: 0
-  penaltyMin: 2147483647
-  penaltyMax: -2147483648
-  nodesX: 0
-  nodesY: 0
 --- !u!4 &1126842765
 Transform:
   m_ObjectHideFlags: 0
@@ -4287,50 +4282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee3eb4ce4bc6b18e0a1787e49f46711f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navGrid: {fileID: 0}
---- !u!114 &1126842767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126842763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d64fd0a0c868152397d7869c5de3035, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1126842768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126842763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9969e3291f50ce6c9aad78f4b17ae77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blockingMask:
-    serializedVersion: 2
-    m_Bits: 8
-  gridSize: {x: 30, y: 30}
-  nodeSize: 0.5
-  walkableRegions:
-  - terrainMask:
-      serializedVersion: 2
-      m_Bits: 64
-    terrainPenalty: 0
-  - terrainMask:
-      serializedVersion: 2
-      m_Bits: 65
-    terrainPenalty: 50
-  obstacleAvoidanceStrength: 10
-  smoothWeights: 1
-  smoothing: 1
-  collisionDebug: 0
-  onlyDisplayPath: 0
 --- !u!1 &1150273745
 GameObject:
   m_ObjectHideFlags: 0
@@ -4471,8 +4422,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1175696556}
   - component: {fileID: 1175696559}
+  - component: {fileID: 1175696558}
   - component: {fileID: 1175696557}
-  - component: {fileID: 1175696560}
   m_Layer: 0
   m_Name: TestNavAgent (4)
   m_TagString: Untagged
@@ -4530,6 +4481,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &1175696558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175696555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &1175696559
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4582,20 +4547,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1175696560
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175696555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &1205560895
 GameObject:
   m_ObjectHideFlags: 0
@@ -5126,8 +5077,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1297437824}
   - component: {fileID: 1297437827}
+  - component: {fileID: 1297437826}
   - component: {fileID: 1297437825}
-  - component: {fileID: 1297437828}
   m_Layer: 0
   m_Name: TestNavAgent (2)
   m_TagString: Untagged
@@ -5185,6 +5136,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &1297437826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297437823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &1297437827
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5237,20 +5202,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1297437828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1297437823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &1322025215
 GameObject:
   m_ObjectHideFlags: 0
@@ -6202,8 +6153,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1574222236}
   - component: {fileID: 1574222235}
+  - component: {fileID: 1574222234}
   - component: {fileID: 1574222237}
-  - component: {fileID: 1574222238}
   m_Layer: 4
   m_Name: TestNavAgent
   m_TagString: Untagged
@@ -6211,6 +6162,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1574222234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574222233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &1574222235
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6313,20 +6278,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &1574222238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1574222233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &1593331946
 GameObject:
   m_ObjectHideFlags: 0
@@ -7575,8 +7526,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2078212367}
   - component: {fileID: 2078212370}
+  - component: {fileID: 2078212369}
   - component: {fileID: 2078212368}
-  - component: {fileID: 2078212371}
   m_Layer: 0
   m_Name: TestNavAgent (6)
   m_TagString: Untagged
@@ -7634,6 +7585,20 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &2078212369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078212366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef37a8fb23196740aa08fc062cd0a3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 356756922}
+  pathRefresh: 0.25
 --- !u!212 &2078212370
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7686,20 +7651,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2078212371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2078212366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b80d4c6e19ff799da9aabee58b14e74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  pathRefresh: 0.25
 --- !u!1 &2108214992
 GameObject:
   m_ObjectHideFlags: 0
