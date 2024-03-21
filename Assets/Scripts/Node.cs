@@ -5,7 +5,7 @@ using UnityEngine;
 namespace nc543.Nav2D{
     public class Node : IHeapItem<Node>{
         public bool traversable;
-        public Vector2 position;
+        public Vector3 position;
         public int x;
         public int y;
         public int gCost;
@@ -14,7 +14,7 @@ namespace nc543.Nav2D{
         public int movementPenalty;
         int heapIndex;
 
-        public Node(bool _traversable, Vector2 _position, int _x, int _y, int _penalty){
+        public Node(bool _traversable, Vector3 _position, int _x, int _y, int _penalty){
             traversable = _traversable;
             position = _position;
             x = _x;

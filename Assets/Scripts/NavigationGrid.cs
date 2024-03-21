@@ -28,8 +28,10 @@ namespace nc543.Nav2D{
         Node[,] navGrid;
         int nodesX;
         int nodesY;
+        PathRequestManager requestManager;
 
         void Awake(){
+            requestManager = GetComponent<PathRequestManager>();
             nodesX = Mathf.RoundToInt(gridSize.x/nodeSize);
             nodesY = Mathf.RoundToInt(gridSize.y/nodeSize);
 
@@ -43,14 +45,18 @@ namespace nc543.Nav2D{
             generateNavigationGrid();
         }
 
+        public void startPathfinding(Vector3 start, Vector3 end){
+            StartCoroutine(findPath(start, end));
+        }
+
         private void generateNavigationGrid(){
             navGrid = new Node[nodesX, nodesY];
 
-            Vector2 bottomLeftLoc = new Vector2(transform.position.x, transform.position.y) - (Vector2.right * (gridSize.x / 2)) - (Vector2.up * (gridSize.y / 2));
+            Vector3 bottomLeftLoc = transform.position - (Vector3.right * (gridSize.x / 2)) - (Vector3.up * (gridSize.y / 2));
 
             for (int i = 0; i < nodesX; i++){
                 for (int j = 0; j < nodesY; j++){
-                    Vector2 loc = bottomLeftLoc + (Vector2.right * ((i * nodeSize) + (nodeSize / 2))) + (Vector2.up * ((j * nodeSize) + (nodeSize / 2)));
+                    Vector3 loc = bottomLeftLoc + (Vector3.right * ((i * nodeSize) + (nodeSize / 2))) + (Vector3.up * ((j * nodeSize) + (nodeSize / 2)));
                     bool traverse = !Physics2D.OverlapBox(loc, new Vector2(nodeSize / 2, nodeSize / 2), 0, blockingMask);
                     int movementPenalty = 0;
                     Collider2D spot = Physics2D.OverlapBox(loc, new Vector2(nodeSize / 2, nodeSize / 2), 0, walkableMask);
@@ -68,26 +74,27 @@ namespace nc543.Nav2D{
         void blurMap(int blurSize){
             print("Running blur");
             int kernelSize = blurSize * 2 + 1;
+            int kernelExtents = (kernelSize - 1) / 2;
 
             int[,] horizontalPass = new int[nodesX, nodesY];
             int[,] verticalPass = new int[nodesX, nodesY];
 
             for (int i = 0; i < nodesY; i++){
-                for (int j = -blurSize; j <= blurSize; j++){
-                    int sampleX = Mathf.Clamp(j, 0, blurSize);
+                for (int j = -kernelExtents; j <= kernelExtents; j++){
+                    int sampleX = Mathf.Clamp(j, 0, kernelExtents);
                     horizontalPass[0, i] += navGrid[sampleX, i].movementPenalty;
                 }
 
                 for (int j = 1; j < nodesX; j++){
-                    int removeIndex = Mathf.Clamp(j - blurSize - 1, 0, nodesX);
-                    int addIndex = Mathf.Clamp(j + blurSize, 0, nodesX - 1);
+                    int removeIndex = Mathf.Clamp(j - kernelExtents - 1, 0, nodesX);
+                    int addIndex = Mathf.Clamp(j + kernelExtents, 0, nodesX - 1);
                     horizontalPass[j, i] = horizontalPass[j - 1, i] - navGrid[removeIndex, i].movementPenalty + navGrid[addIndex, i].movementPenalty;
                 }
             }
 
             for (int i = 0; i < nodesX; i++){
-                for (int j = -blurSize; j <= blurSize; j++){
-                    int sampleY = Mathf.Clamp(j, 0, blurSize);
+                for (int j = -kernelExtents; j <= kernelExtents; j++){
+                    int sampleY = Mathf.Clamp(j, 0, kernelExtents);
                     verticalPass[i, 0] += horizontalPass[i, sampleY];
                 }
 
@@ -95,8 +102,8 @@ namespace nc543.Nav2D{
                 navGrid[i, 0].movementPenalty = blurredPenalty;
 
                 for (int j = 1; j < nodesY; j++){
-                    int removeIndex = Mathf.Clamp(j - blurSize - 1, 0, nodesY);
-                    int addIndex = Mathf.Clamp(j + blurSize, 0, nodesY - 1);
+                    int removeIndex = Mathf.Clamp(j - kernelExtents - 1, 0, nodesY);
+                    int addIndex = Mathf.Clamp(j + kernelExtents, 0, nodesY - 1);
                     verticalPass[i, j] = verticalPass[i, j - 1] - horizontalPass[i, removeIndex] + horizontalPass[i, addIndex];
                     blurredPenalty = Mathf.RoundToInt((float) verticalPass[i, j] / (kernelSize * kernelSize));
                     navGrid[i, j].movementPenalty = blurredPenalty;
@@ -127,18 +134,18 @@ namespace nc543.Nav2D{
             return neighbors;
         }
 
-        public Node worldToNavGrid(Vector2 pos){
+        public Node worldToNavGrid(Vector3 pos){
             float percentX = Mathf.Clamp01(((pos.x * 1.025f - transform.position.x) / gridSize.x) + 0.5f);
             float percentY = Mathf.Clamp01(((pos.y * 1.025f - transform.position.y) / gridSize.y) + 0.5f);
 
             return navGrid[Mathf.RoundToInt((nodesX - 1) * percentX), Mathf.RoundToInt((nodesY - 1) * percentY)];
         }
 
-        public void findPath(PathRequest request, Action<PathResult> callback){
-            Node startNode = worldToNavGrid(request.start);
-            Node targetNode = worldToNavGrid(request.end);
+        private IEnumerator findPath(Vector3 start, Vector3 target){
+            Node startNode = worldToNavGrid(start);
+            Node targetNode = worldToNavGrid(target);
 
-            Vector2[] navigation = {};
+            Vector3[] navigation = {};
             bool successful = false;
 
             if (startNode.traversable && targetNode.traversable){
@@ -170,27 +177,27 @@ namespace nc543.Nav2D{
                     }
                 }
             }
+            yield return null;
             if (successful){
                 navigation = tracePath(startNode, targetNode);
-                successful = navigation.Length > 0;
             }
-            callback(new PathResult(navigation, successful, request.callback));
+            requestManager.finishedPath(navigation, successful);
         }
 
-        private Vector2[] tracePath(Node startNode, Node endNode){
+        private Vector3[] tracePath(Node startNode, Node endNode){
             path = new List<Node>();
             Node currentNode = endNode;
             while (currentNode != startNode){
                 path.Add(currentNode);
                 currentNode = currentNode.pastNode;
             }
-            Vector2[] navigation = simplifyPath(path);
+            Vector3[] navigation = simplifyPath(path);
             Array.Reverse(navigation);
             return navigation;
         }
 
-        private Vector2[] simplifyPath(List<Node> path){
-            List<Vector2> nav = new List<Vector2>();
+        private Vector3[] simplifyPath(List<Node> path){
+            List<Vector3> nav = new List<Vector3>();
             Vector2 oldDir = Vector2.zero;
 
             for (int i = 1; i < path.Count; i++){

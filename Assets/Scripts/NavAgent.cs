@@ -7,15 +7,14 @@ public class NavAgent : MonoBehaviour
 {
     public Transform target;
     float speed = 5;
-    [SerializeField] float pathRefresh = .25f;
-    Vector2[] path;
+    Vector3[] path;
     int targetIndex;
 
     void Start(){
-        StartCoroutine(updatePath());
+        PathRequestManager.requestPath(transform.position, target.position, onPathFound);
     }
 
-    public void onPathFound(Vector2[] newPath, bool pathFound){
+    public void onPathFound(Vector3[] newPath, bool pathFound){
         if (pathFound){
             path = newPath;
             StopCoroutine("followPath");
@@ -23,21 +22,11 @@ public class NavAgent : MonoBehaviour
         }
     }
 
-    private IEnumerator updatePath(){
-        if (Time.timeSinceLevelLoad < .3f){
-            yield return new WaitForSeconds(.3f);
-        }
-        while (true){
-            yield return new WaitForSeconds(pathRefresh);
-            PathRequestManager.requestPath(new PathRequest(transform.position, target.position, onPathFound));
-        }
-    }
-
     private IEnumerator followPath(){
-        Vector2 currentPoint = path[0];
+        Vector3 currentPoint = path[0];
 
         while (true){
-            if (new Vector2(transform.position.x, transform.position.y) == currentPoint){
+            if (transform.position == currentPoint){
                 targetIndex++;
                 if (targetIndex >= path.Length){
                     yield break;
@@ -45,7 +34,7 @@ public class NavAgent : MonoBehaviour
                 currentPoint = path[targetIndex];
             }
 
-            transform.position = Vector2.MoveTowards(transform.position, currentPoint, speed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, currentPoint, speed * Time.deltaTime);
             yield return null;
         }
     }

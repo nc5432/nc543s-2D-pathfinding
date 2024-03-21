@@ -2,14 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading;
 
 namespace nc543.Nav2D{
     public class PathRequestManager : MonoBehaviour{
-
+        Queue<PathRequest> requestQueue = new Queue<PathRequest>();
+        PathRequest currentRequest;
         private NavigationGrid navGrid;
+        private bool isProcessing = false;
+        
         public static PathRequestManager instance;
-        Queue<PathResult> results = new Queue<PathResult>();
 
         void Awake(){
             if (instance == null){
@@ -20,53 +21,36 @@ namespace nc543.Nav2D{
             }
         }
 
-        void Update(){
-            if (results.Count > 0){
-                int items = results.Count;
-                lock(results){
-                    for (int i = 0; i < items; i++){
-                        PathResult result = results.Dequeue();
-                        result.callback(result.path, result.success);
-                    }
-                }
+        public static void requestPath(Vector3 start, Vector3 end, Action<Vector3[], bool> callback){
+            PathRequest request = new PathRequest(start, end, callback);
+            instance.requestQueue.Enqueue(request);
+            instance.tryProcessNext();
+        }
+
+        public void finishedPath(Vector3[] path, bool success){
+            currentRequest.callback(path, success);
+            isProcessing = false;
+            tryProcessNext();
+        }
+
+        private void tryProcessNext(){
+            if (!isProcessing && requestQueue.Count > 0){
+                isProcessing = true;
+                currentRequest = requestQueue.Dequeue();
+                navGrid.startPathfinding(currentRequest.start, currentRequest.end);
             }
         }
 
-        public static void requestPath(PathRequest request){
-            ThreadStart threadStart = delegate{
-                instance.navGrid.findPath(request, instance.finishedPath);
-            };
-            threadStart.Invoke();
-        }
+        struct PathRequest{
+            public Vector3 start;
+            public Vector3 end;
+            public Action<Vector3[], bool> callback;
 
-        public void finishedPath(PathResult result){
-            lock(results){
-                results.Enqueue(result);
+            public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback){
+                start = _start;
+                end = _end;
+                callback = _callback;
             }
-        }
-    }
-
-    public struct PathRequest{
-        public Vector2 start;
-        public Vector2 end;
-        public Action<Vector2[], bool> callback;
-
-        public PathRequest(Vector2 _start, Vector2 _end, Action<Vector2[], bool> _callback){
-            start = _start;
-            end = _end;
-            callback = _callback;
-        }
-    }
-
-    public struct PathResult{
-        public Vector2[] path;
-        public bool success;
-        public Action<Vector2[], bool> callback;
-
-        public PathResult(Vector2[] path, bool success, Action<Vector2[], bool> callback){
-            this.path = path;
-            this.success = success;
-            this.callback = callback;
         }
     }
 }
