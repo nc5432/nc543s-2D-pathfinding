@@ -66,7 +66,6 @@ namespace nc543.Nav2D{
         }
 
         void blurMap(int blurSize){
-            print("Running blur");
             int kernelSize = blurSize * 2 + 1;
 
             int[,] horizontalPass = new int[nodesX, nodesY];
