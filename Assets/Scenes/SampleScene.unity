@@ -4215,6 +4215,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1126842765}
+  - component: {fileID: 1126842764}
+  - component: {fileID: 1126842766}
   - component: {fileID: 1126842768}
   - component: {fileID: 1126842767}
   m_Layer: 0
@@ -4224,6 +4226,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1126842764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126842763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdf20ad787da404a689ce08cc88186c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockingMask:
+    m_Bits: 8
+  gridSize: {x: 30, y: 30}
+  nodeSize: 0.5
+  walkableRegions:
+  - terrainMask:
+      m_Bits: 64
+    terrainPenalty: 0
+  - terrainMask:
+      m_Bits: 1
+    terrainPenalty: 50
+  walkableMask:
+    m_Bits: 0
+  obstacleAvoidanceStrength: 100
+  smoothWeights: 1
+  smoothing: 1
+  collisionDebug: 0
+  onlyDisplayPath: 0
+  penaltyMin: 2147483647
+  penaltyMax: -2147483648
+  nodesX: 0
+  nodesY: 0
 --- !u!4 &1126842765
 Transform:
   m_ObjectHideFlags: 0
@@ -4239,6 +4275,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1126842766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126842763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee3eb4ce4bc6b18e0a1787e49f46711f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navGrid: {fileID: 0}
 --- !u!114 &1126842767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4275,7 +4324,7 @@ MonoBehaviour:
     terrainPenalty: 0
   - terrainMask:
       serializedVersion: 2
-      m_Bits: 1
+      m_Bits: 65
     terrainPenalty: 50
   obstacleAvoidanceStrength: 10
   smoothWeights: 1
