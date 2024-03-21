@@ -28,7 +28,7 @@ namespace nc543.Nav2D{
             }
             while (true){
                 yield return new WaitForSeconds(pathRefresh);
-                PathRequestManager.requestPath(new PathRequest(transform.position, target.position, onPathFound));
+                if (target != null) PathRequestManager.requestPath(new PathRequest(transform.position, target.position, onPathFound));
             }
         }
 
